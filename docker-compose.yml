@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+  blog.test:
+    build:
+      context: ./.docker/php/8.2
+      dockerfile: Dockerfile
+      target: development
+      args:
+        WWWGROUP: '${WWWGROUP}'
+    image: blog-8.2/app
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '${APP_PORT:-80}:80'
+    volumes:
+      - '.:/app'
+    networks:
+      - blog
+    depends_on:
+      - pgsql
+
+  pgsql:
+    image: 'postgres:16'
+    ports:
+      - '${FORWARD_DB_PORT:-5432}:5432'
+    environment:
+      PGPASSWORD: '${DB_PASSWORD:-secret}'
+      POSTGRES_DB: '${DB_DATABASE}'
+      POSTGRES_USER: '${DB_USERNAME}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+    volumes:
+      - 'blog-pgsql:/var/lib/postgresql/data'
+      - './.docker/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
+    networks:
+      - blog
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}" ]
+      retries: 3
+      timeout: 5s
+
+networks:
+  blog:
+    driver: bridge
+volumes:
+  blog-pgsql:
+    driver: local
