@@ -1,0 +1,64 @@
+@startuml
+    skinparam linetype ortho
+
+    entity users {
+        *id: unsigned integer <<generated>> <<PK>>
+        --
+        first_name: varchar(255)
+        last_name: varchar(255)
+        birthday: Date
+        *email: varchar(255)
+        *password: varchar(255)
+        gender: unsigned tinyint
+        created_at: DateTime "DEFAULT CURRENT_TIMESTAMP"
+        updated_at: DateTime "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    }
+
+    entity posts {
+        *id: unsigned integer <<generated>> <<PK>>
+        --
+        *user_id: unsigned integer <<FK1>>
+        *title: varchar(255)
+        *text: text
+        category_id: unsigned integer <<FK2>>
+        created_at: DateTime "DEFAULT CURRENT_TIMESTAMP"
+        updated_at: DateTime "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    }
+
+    users ||--o{ posts
+
+    entity post_categories {
+        *id: unsigned integer <<generated>> <<PK>>
+        --
+        *name: string
+    }
+
+    post_categories |o--o{ posts
+
+    entity post_tags {
+        *name: string <<PK>>
+    }
+
+    entity post_has_tags {
+        *post_id: unsigned integer <<PK>> <<FK1>>
+        *tag:string  <<PK>> <<FK2>>
+        created_at: DateTime "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    posts ||--o{ post_has_tags
+
+    post_tags ||--o{ post_has_tags
+
+    entity post_comments {
+        *id: unsigned integer <<generated>> <<PK>>
+        --
+        *post_id: unsigned integer <<FK1>>
+        *comment: text
+        *user_id: unsigned integer <<FK2>>
+        created_at: DateTime "DEFAULT CURRENT_TIMESTAMP"
+        updated_at: DateTime "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+    }
+
+    posts ||--o{ post_comments
+    users ||--o{ post_comments
+@enduml

@@ -1,0 +1,70 @@
+@startuml
+    skinparam linetype ortho
+
+    namespace User {
+        class User {
+            -int id
+            -string firstName
+            -string lastName
+            -Email email
+            -string password
+            -DateTimeImmutable birthday
+            -Gender gender
+            -DateTimeImmutable createdAt
+            -DateTime updatedAt
+            +void setUpdated()
+        }
+
+        enum Gender {
+            +Male
+            +Female
+        }
+    }
+
+    User.User *-- Gender
+
+    class Email {
+        -string email
+    }
+    User.User *-- Email
+
+    namespace Post {
+        class Category {
+            -integer id
+            -string name
+        }
+
+        class Post {
+            -integer id
+            -integer userId
+            -string title
+            -string text
+            -integer categoryId
+            -Tag[] tags
+            -DateTimeImmutable createdAt
+            -DateTime updatedAt
+            +void setUpdated()
+        }
+
+        Post o-- Category
+        Post o-- User.User
+
+        class Tag {
+            -name string
+        }
+        Post o-- Tag
+
+        class Comment {
+            -integer id
+            -integer postId
+            -integer userId
+            -string comment
+            -DateTimeImmutable createdAt
+            -DateTime updatedAt
+            +void setUpdated()
+        }
+        Comment o-- Post
+        Comment o-- User.User
+
+    }
+@enduml
