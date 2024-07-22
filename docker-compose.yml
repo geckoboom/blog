@@ -19,6 +19,8 @@ services:
       - blog
     depends_on:
       - pgsql
+    environment:
+      PHP_IDE_CONFIG: "serverName=blog"
 
   pgsql:
     image: 'postgres:16'
