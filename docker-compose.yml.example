@@ -1,0 +1,53 @@
+version: "3.9"
+services:
+  php-fpm:
+    container_name: php-fpm
+    build:
+      context: ./.docker/PHP/fpm/${PHP_VERSION}
+      args:
+        XDEBUG_VERSION: ${XDEBUG_VERSION}
+    ports:
+      - "9000:9000"
+    environment:
+      PHP_XDEBUG_MODE: "debug"
+      PHP_IDE_CONFIG: "serverName=blog"
+    volumes:
+      - ./:/app
+      - .docker/PHP/fpm/${PHP_VERSION}/logs:/var/log/php-fpm
+    networks:
+      - webserver
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    healthcheck:
+      test: ["CMD", "sh", "-c", "echo 'ping' | nc 127.0.0.1 9000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  nginx:
+    build:
+      context: ./.docker/nginx
+    ports:
+      - "${NGINX_PORT}:80"
+    volumes:
+      - ./:/app:ro
+      - ./.docker/nginx/logs:/var/log/nginx
+    depends_on:
+      php-fpm:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      webserver:
+        aliases:
+            - blog.local
+
+networks:
+  webserver:
+    driver: bridge
+
+
