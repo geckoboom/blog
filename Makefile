@@ -24,3 +24,15 @@ up: composer-install docker-up
 
 docker-down:
 	docker-compose down
+
+composer-update:
+	docker run --rm --interactive --tty \
+     --user $(id -u):$(id -g) \
+      --volume $(PWD):/app \
+      composer update
+
+composer:
+	docker run --rm --interactive --tty \
+     --user $(id -u):$(id -g) \
+      --volume $(PWD):/app \
+      composer $(ARGS)
