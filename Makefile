@@ -36,3 +36,6 @@ composer:
      --user $(id -u):$(id -g) \
       --volume $(PWD):/app \
       composer $(ARGS)
+
+console:
+	docker exec -it php-fpm bin/console $(ARGS)

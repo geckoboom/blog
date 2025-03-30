@@ -1,0 +1,19 @@
+name: Link Issue to Pull Request
+
+on:
+  pull_request:
+    types: [opened, edited] # Срабатывает при создании или редактировании PR
+
+jobs:
+  link_issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Link issue to pull request
+        id: link-issue
+        uses: peter-evans/close-issue@v2 # Используем готовый action для связи
+        with:
+          issue: ${{ github.event.pull_request.body }} # Передаем описание PR
